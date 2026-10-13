@@ -1,0 +1,11 @@
+services:
+  lab:
+    build: .
+    # strace には ptrace 権限が必要
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+    volumes:
+      - ./out:/work/out
+    command: bash scripts/run-all.sh

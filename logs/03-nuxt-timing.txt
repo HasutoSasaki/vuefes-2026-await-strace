@@ -1,0 +1,11 @@
+## ③ Nuxt SSR  useFetch 直列 vs Promise.all（curl time_total、ページごとに Nuxt 再起動）
+== serial ==
+  cold  0.748413s
+  warm  0.633095s
+  warm  0.633109s
+  warm  0.633185s
+== parallel ==
+  cold  0.436311s
+  warm  0.322873s
+  warm  0.327524s
+  warm  0.326153s

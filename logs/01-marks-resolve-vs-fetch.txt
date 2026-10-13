@@ -1,0 +1,12 @@
+## ① await Promise.resolve()  印A〜印Bの間
+09:02:22.257866 write(1, "MARK A...") = 7 <0.000024>
+09:02:22.258185 write(1, "MARK B...") = 7 <0.000024>
+
+## ① await fetch()  印A〜印Bの間
+09:02:22.300325 write(1, "MARK A...") = 7 <0.000029>
+09:02:22.328028 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 21 <0.000075>
+09:02:22.328629 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000259>
+09:02:22.334873 write(21, "GET /a HTTP/1.1...") = 170 <0.000054>
+09:02:22.336283 epoll_pwait(15, [...], 1024, 490, NULL, 8) = 1 <0.302654>
+09:02:22.640491 read(21, "HTTP/1.1 200 OK...") = 172 <0.000060>
+09:02:22.651873 write(1, "MARK B...") = 7 <0.000043>

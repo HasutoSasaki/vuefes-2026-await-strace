@@ -1,0 +1,7 @@
+{
+  "name": "nuxt-strace-exp",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "nuxt build" },
+  "dependencies": { "nuxt": "^4" }
+}

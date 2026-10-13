@@ -1,0 +1,25 @@
+# apt のパッケージサーバーに出られない環境向け。strace をソースからビルドする。
+# 事前に .cache/strace-6.8.tar.xz を置く:
+#   curl -sSL -o .cache/strace-6.8.tar.xz https://github.com/strace/strace/releases/download/v6.8/strace-6.8.tar.xz
+# プロキシが TLS を終端する環境では、その CA を .cache/ca-bundle.crt に置くと npm がそれを信頼する（任意）。
+# ビルド: docker build -f Dockerfile.source -t await-strace-lab .
+ARG BASE_IMAGE=node:22-bookworm
+FROM ${BASE_IMAGE}
+
+COPY .cache/ /tmp/cache/
+RUN cd /tmp && tar xf cache/strace-6.8.tar.xz && cd strace-6.8 \
+ && ./configure --enable-mpers=no > /dev/null \
+ && make -j"$(nproc)" > /dev/null \
+ && make install > /dev/null \
+ && cd / && rm -rf /tmp/strace-6.8 \
+ && strace -V | head -1
+RUN if [ -f /tmp/cache/ca-bundle.crt ]; then npm config set -g cafile /tmp/cache/ca-bundle.crt; fi
+
+WORKDIR /work
+COPY experiments ./experiments
+COPY scripts ./scripts
+
+RUN cd experiments/nuxt && npm ci --no-audit --no-fund && npx nuxt build
+
+ENV IN_DOCKER=yes
+CMD ["bash", "scripts/run-all.sh"]

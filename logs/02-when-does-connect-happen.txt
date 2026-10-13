@@ -1,0 +1,21 @@
+## F: fetch() 直後に 1 秒ビジーループ → socket() すら出ない
+09:02:30.848386 write(1, "MARK fetch called 18...") = 23 <0.000031>
+09:02:31.848796 write(1, "MARK busy done   101...") = 24 <0.000035>
+09:02:31.849285 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 21 <0.000039>
+09:02:31.849799 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000091>
+
+## G: fetch() → await Promise.resolve() → 500ms ビジー（マイクロタスクではイベントループに戻らない）
+09:02:32.269815 write(1, "MARK fetch called 25...") = 23 <0.000028>
+09:02:32.270333 write(1, "MARK after await Pro...") = 38 <0.000024>
+09:02:32.770708 write(1, "MARK busy done 526ms...") = 21 <0.000034>
+09:02:32.771859 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000091>
+09:02:32.776369 epoll_pwait(15, [...], 1024, 495, NULL, 8) = 1 <0.301163>
+09:02:33.091911 write(1, "MARK pa resolved 847...") = 23 <0.000085>
+
+## H: fetch() → await setTimeout(0) → 500ms ビジー（イベントループに戻ると connect が出る）
+09:02:33.183392 write(1, "MARK fetch called 19...") = 23 <0.000032>
+09:02:33.184468 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000078>
+09:02:33.184861 write(1, "MARK after await set...") = 34 <0.000032>
+09:02:33.685274 write(1, "MARK busy done 521ms...") = 21 <0.000037>
+09:02:33.691003 epoll_pwait(15, [...], 1024, 499, NULL, 8) = 1 <0.305660>
+09:02:34.014766 write(1, "MARK pa resolved 850...") = 23 <0.000091>

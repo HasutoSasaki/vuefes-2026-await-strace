@@ -1,0 +1,27 @@
+## ③ Nuxt serial.vue  await useFetch(a); await useFetch(b)  初回リクエスト
+09:02:38.140070 write(1, "MARK serial start...") = 18 <0.000112>
+09:02:38.144270 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 23 <0.000025>
+09:02:38.144556 connect(23, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000091>
+09:02:38.147094 write(23, "GET /a HTTP/1.1...") = 170 <0.000042>
+09:02:38.147609 epoll_pwait(15, [...], 1024, 495, NULL, 8) = 1 <0.309949>
+09:02:38.458250 read(23, "HTTP/1.1 200 OK...") = 172 <0.000078>
+09:02:38.475107 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 24 <0.000078>
+09:02:38.476361 connect(24, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000211>
+09:02:38.479534 write(24, "GET /b HTTP/1.1...") = 170 <0.000117>
+09:02:38.480685 epoll_pwait(15, [], 1024, 162, NULL, 8) = 0 <0.166521>
+09:02:38.649757 epoll_pwait(15, [...], 1024, 498, NULL, 8) = 1 <0.136920>
+09:02:38.787342 read(24, "HTTP/1.1 200 OK...") = 172 <0.000049>
+09:02:38.791916 write(1, "MARK serial end...") = 16 <0.000479>
+
+## ③ Nuxt parallel.vue  Promise.all([useFetch(a), useFetch(b)])  初回リクエスト
+09:02:44.379768 write(1, "MARK parallel start...") = 20 <0.000091>
+09:02:44.384126 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 23 <0.000042>
+09:02:44.384508 connect(23, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000103>
+09:02:44.384799 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 24 <0.000037>
+09:02:44.385240 connect(24, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000054>
+09:02:44.388343 write(23, "GET /a HTTP/1.1...") = 170 <0.000041>
+09:02:44.389244 write(24, "GET /b HTTP/1.1...") = 170 <0.000028>
+09:02:44.389743 epoll_pwait(15, [...], 1024, 493, NULL, 8) = 1 <0.305665>
+09:02:44.696259 read(23, "HTTP/1.1 200 OK...") = 172 <0.000057>
+09:02:44.714264 read(24, "HTTP/1.1 200 OK...") = 172 <0.000058>
+09:02:44.716844 write(1, "MARK parallel end...") = 18 <0.000288>
