@@ -1,0 +1,40 @@
+## ② B を絞り込みなしで取ったときの epoll / io_uring まわり
+## epoll への登録（EPOLL_CTL_ADD / MOD）は libuv が io_uring_enter でまとめて送る。epoll_ctl の syscall は登録の削除（EPOLL_CTL_DEL）だけ
+23:24:53.708471 epoll_create1(EPOLL_CLOEXEC) = 3 <0.000068>
+23:24:53.712212 io_uring_setup(256, {...}) = 4 <0.000086>
+23:24:53.729890 epoll_create1(EPOLL_CLOEXEC) = 10 <0.000049>
+23:24:53.730416 io_uring_setup(256, {...}) = 11 <0.000121>
+23:24:53.734166 io_uring_enter(11, 2, 2, IORING_ENTER_GETEVENTS, NULL, 0) = 2 <0.000333>
+23:24:53.770289 epoll_create1(EPOLL_CLOEXEC) = 15 <0.000034>
+23:24:53.770617 io_uring_setup(256, {...}) = 16 <0.000058>
+23:24:53.943122 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 21 <0.000207>
+23:24:53.953027 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.002151>
+23:24:53.955592 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 22 <0.000097>
+23:24:53.960613 connect(22, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000188>
+23:24:53.961334 io_uring_enter(16, 4, 4, IORING_ENTER_GETEVENTS, NULL, 0) = 4 <0.000105>
+23:24:53.964044 getsockopt(21, SOL_SOCKET, SO_ERROR, [0], [4]) = 0 <0.000087>
+23:24:53.966758 getsockopt(22, SOL_SOCKET, SO_ERROR, [0], [4]) = 0 <0.000090>
+23:24:53.968774 io_uring_enter(16, 2, 2, IORING_ENTER_GETEVENTS, NULL, 0) = 2 <0.000083>
+23:24:53.969098 io_uring_enter(16, 2, 2, IORING_ENTER_GETEVENTS, NULL, 0) = 2 <0.000082>
+23:24:53.984257 write(21, "GET /a HTTP/1.1...") = 170 <0.000131>
+23:24:53.984886 write(22, "GET /b HTTP/1.1...") = 170 <0.000080>
+23:24:53.985617 epoll_pwait(15, [{events=EPOLLIN, data={u32=21, u64=21}}], 1024, 455, NULL, 8) = 1 <0.305291>
+23:24:54.291646 read(21, "HTTP/1.1 200 OK...") = 172 <0.000052>
+23:24:54.313012 read(22, "HTTP/1.1 200 OK...") = 172 <0.000067>
+23:24:54.519912 epoll_ctl(15, EPOLL_CTL_DEL, 2, 0xfffffaf7fb30) = -1 ENOENT (No such file or directory) <0.000023>
+23:24:54.520085 epoll_ctl(15, EPOLL_CTL_DEL, 21, 0xfffffaf7fb30) = 0 <0.000016>
+23:24:54.520226 close(21)         = 0 <0.000071>
+23:24:54.520809 epoll_ctl(15, EPOLL_CTL_DEL, 22, 0xfffffaf7fb30) = 0 <0.000018>
+23:24:54.521037 close(22)         = 0 <0.000031>
+23:24:54.521239 epoll_ctl(15, EPOLL_CTL_DEL, 1, 0xfffffaf7fb30) = -1 ENOENT (No such file or directory) <0.000019>
+23:24:54.550197 close(21) = 0 <0.000080>
+23:24:54.556176 io_uring_enter(4, 2, 2, IORING_ENTER_GETEVENTS, NULL, 0) = 2 <0.000075>
+
+## システムコールの回数（strace -c）
+% time     seconds  usecs/call     calls    errors syscall
+ 19.84    0.234235       23423        10           epoll_pwait
+  0.07    0.000797         265         3           io_uring_setup
+  0.01    0.000176          35         5           io_uring_enter
+  0.01    0.000062          20         3           epoll_create1
+  0.00    0.000000           0         4         2 epoll_ctl
+100.00    1.180878         694      1700        34 total

@@ -6,11 +6,12 @@ cd "$(dirname "$0")"
 MOCK=${MOCK:-../mock.mjs}
 OUT=${OUT:-.}
 mkdir -p "$OUT"
+PAGES=${PAGES:-serial parallel nowait}
 
 node "$MOCK" > "$OUT/03-mock.log" 2>&1 & MOCK_PID=$!
 sleep 1
 
-for page in serial parallel; do
+for page in $PAGES; do
   PORT=3001 strace -f -tt -T -e trace=socket,connect,epoll_pwait,write,read \
     -o "$OUT/03-nuxt-${page}.log" node .output/server/index.mjs > "$OUT/03-nuxt-${page}-stdout.log" 2>&1 &
   STRACE_PID=$!

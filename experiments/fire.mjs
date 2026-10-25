@@ -23,3 +23,27 @@ if (mode === 'F') {
   await pa;
   console.log(`pa resolved  ${ms()}`);
 }
+
+if (mode === 'F2') {
+  // C と同じく先に 2 本呼んでから、JS の実行を 1 秒間続ける（同期ビジーループ）
+  const pa = fetch(`${base}/a`);
+  const pb = fetch(`${base}/b`);
+  process.stdout.write(`MARK fetch called ${ms()}\n`);
+  const end = performance.now() + 1000;
+  while (performance.now() < end) {}
+  process.stdout.write(`MARK busy done   ${ms()}\n`);
+  await pa;
+  await pb;
+  console.log(`pa pb resolved  ${ms()}`);
+}
+
+if (mode === 'F3') {
+  // B と同じく Promise.all で 2 本束ねてから、JS の実行を 1 秒間続ける（同期ビジーループ）
+  const p = Promise.all([fetch(`${base}/a`), fetch(`${base}/b`)]);
+  process.stdout.write(`MARK fetch called ${ms()}\n`);
+  const end = performance.now() + 1000;
+  while (performance.now() < end) {}
+  process.stdout.write(`MARK busy done   ${ms()}\n`);
+  await p;
+  console.log(`p resolved  ${ms()}`);
+}

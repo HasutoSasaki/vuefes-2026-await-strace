@@ -4,6 +4,24 @@
 09:02:31.849285 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 21 <0.000039>
 09:02:31.849799 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000091>
 
+## F2: C と同じく 2 本呼んでから 1 秒ビジーループ → ループ後に socket() と connect() が 2 本まとめて出る
+12:39:46.944415 write(1, "MARK fetch called 32...") = 23 <0.000041>
+12:39:47.948415 write(1, "MARK busy done   103...") = 24 <0.000044>
+12:39:47.949108 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 21 <0.000046>
+12:39:47.949896 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000104>
+12:39:47.953011 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 22 <0.000034>
+12:39:47.953344 connect(22, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000059>
+12:39:47.961103 epoll_pwait(15, [...], 1024, 491, NULL, 8) = 1 <0.312348>
+
+## F3: B と同じく Promise.all で 2 本束ねてから 1 秒ビジーループ → ループ後に socket() と connect() が 2 本まとめて出る
+12:48:23.817159 write(1, "MARK fetch called 40...") = 23 <0.000029>
+12:48:24.819128 write(1, "MARK busy done   104...") = 24 <0.000129>
+12:48:24.821239 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 21 <0.000075>
+12:48:24.821991 connect(21, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000162>
+12:48:24.826450 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 22 <0.000034>
+12:48:24.827668 connect(22, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000182>
+12:48:24.841754 epoll_pwait(15, [...], 1024, 487, NULL, 8) = 1 <0.316442>
+
 ## G: fetch() → await Promise.resolve() → 500ms ビジー（マイクロタスクではイベントループに戻らない）
 09:02:32.269815 write(1, "MARK fetch called 25...") = 23 <0.000028>
 09:02:32.270333 write(1, "MARK after await Pro...") = 38 <0.000024>

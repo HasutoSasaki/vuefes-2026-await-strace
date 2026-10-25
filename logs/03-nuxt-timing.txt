@@ -9,3 +9,8 @@
   warm  0.322873s
   warm  0.327524s
   warm  0.326153s
+== nowait ==
+  cold  0.470505s
+  warm  0.317106s
+  warm  0.325518s
+  warm  0.335284s

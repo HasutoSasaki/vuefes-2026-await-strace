@@ -1,0 +1,12 @@
+## ③ Nuxt nowait.vue  useFetch(a); useFetch(b)（await なし）  初回リクエスト
+08:55:04.723424 write(1, "MARK nowait start...") = 18 <0.000149>
+08:55:04.731067 write(1, "MARK nowait end...") = 16 <0.000161>
+08:55:04.731992 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 23 <0.000042>
+08:55:04.732488 connect(23, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000258>
+08:55:04.733290 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 24 <0.000040>
+08:55:04.733710 connect(24, 127.0.0.1:3000) = -1 EINPROGRESS (Operation now in progress) <0.000092>
+08:55:04.736030 write(23, "GET /a HTTP/1.1...") = 170 <0.000054>
+08:55:04.736866 write(24, "GET /b HTTP/1.1...") = 170 <0.000035>
+08:55:04.737453 epoll_pwait(15, [...], 1024, 490, NULL, 8) = 1 <0.311644>
+08:55:05.050113 read(23, "HTTP/1.1 200 OK...") = 172 <0.000138>
+08:55:05.071175 read(24, "HTTP/1.1 200 OK...") = 172 <0.000071>
